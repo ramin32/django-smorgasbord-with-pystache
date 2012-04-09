@@ -1,0 +1,170 @@
+------
+README
+------
+
+Summary
+=======
+
+Smorgasbord is a Django application that provides transparent support
+for multiple templating languages in Django, even for 3rd party
+applications that don't use your choice of template language natively.
+Using Smorgasbord, you can use templates written in a different
+language with applications written to Django's own high-level
+templating API.
+
+Motivation
+==========
+
+The goal of Smorgasbord is to be able to use alternative template
+languages not only to write new code, but to customize the templates
+used by 3rd party applications whose views use Django's template API
+(in particular, ``render_to_response`` and ``render_to_string``, which
+use the loading mechanism in ``django.template.loader``).  This goal
+requires some patching to Django itself, implemented here as
+the monkeypatching of one function.
+
+Django developers have, it seems, generally not been very interested
+in supporting multiple template engines in the django core; the
+argument goes that you can always simply call another engine's API
+from a view, and hence no support is necessary.  For one (very
+reasonable) statement of this argument, see:
+
+  http://groups.google.com/group/django-users/browse_thread/thread/f41b2434fc2ca5c9/645592cb23bc49ed
+
+The problem remains, however, that if a view uses
+``render_to_response`` it is (normally) tied to Django's own
+templating engine.  A rich ecosystem has emerged of reusable Django
+applications, which are almost always coupled with Django's built-in
+templating in this way; and if you want to use them in your projects,
+you probably will need to customize their templates, and in many cases
+have those templates inherit global characteristics of your site such
+as navigation.  That means that if you want to use an alternative
+engine, and also want to use 3rd party apps, you really have little
+latitude with regard to templating engine choice unless you wish to
+patch or monkeypatch the individual applications themselves, or create
+equivalent base templates written in different template languages,
+both of which alternatives are unpalatable and impose a heavy
+maintainance burden.
+
+Monkeypatching in any form is somewhat unhygienic.  But smorgasbord's
+is directed at a very small and focussed part of the framework itself,
+and should hopefully involve less headache to end users.
+
+
+Usage
+=====
+
+Add to a file that will be imported in your project, such as
+``settings.py`` or ``urls.py``, this code::
+
+  import smorgasbord
+  smorgasbord.monkeypatch()
+
+This will replace ``django.template.loader.get_template`` with
+smorgasbord's template-language-multiplexing equivalent.
+
+Then assign to the configuration variable ``TEMPLATE_LANGUAGES``
+a tuple of languages you want to use, e.g.::
+ 
+  TEMPLATE_LANGUAGES=('django', 'mako', 'jinja2')
+
+For each language (except ``django``, which already uses
+``TEMPLATE_DIRS`` for this purpose) in that tuple, define a tuple of
+directories you want searched::
+
+  MAKO_TEMPLATE_DIRS=('/home/smulloni/smorgasbordtest/templates/mako',)
+  JINJA2_TEMPLATE_DIRS=('/home/smulloni/smorgasbordtest/templates/jinja2',)
+
+The variable name should always be the template language name,
+uppercased, plus ``_TEMPLATE_DIRS``. 
+
+To pass additional options to the template engine, define a variable
+``<ENGINENAME>_TEMPLATE_OPTS``.  For instance::
+
+  MAKO_TEMPLATE_OPTS=dict(
+    input_encoding='utf-8',
+    module_directory=os.path.join(tempfile.gettempdir(),
+                                  os.environ['LOGNAME'],
+                                  'makotemplates'))
+
+
+When Django looks for a file-based template using its modified
+template loading machinery, it take the languages in
+``settings.TEMPLATE_LANGUAGES`` in order, and for each language find
+the corresponding list of directories to search in.  If it finds a
+template of the right name, it returns an object compatible with the
+``django.template.Template`` API (namely, with a compatible
+``render()`` method).
+
+
+Limitations 
+===========
+
+Most views do nothing with templates other than specify a context and
+call ``render_to_response`` or ``render_to_string``.  The goal is for
+these views to work fine with Smorgasbord.  But views that dig deeper
+into the Django template API will not work.
+
+Any transparent support of templating languages requires some
+trade-offs; the different APIs provided by different languages have
+something to do with underlying differences in their feature sets.
+Some support for engine-specific customization is on the roadmap.
+
+Supported Languages 
+===================
+
+Currently mako is fully supported and tested.
+
+A less sure level of support is available for:
+
+    * jinja2
+    * cheetah
+    * STML 
+
+Patches to improve engine support would be welcome.
+
+Support
+=======
+
+Please see http://smorgasbord.googlecode.com/.
+
+Acknowledgements
+================
+
+The project name references Buffet
+(http://projects.dowski.com/view/buffet) with appreciation.
+
+In the great-minds-think-alike department, it appears that Mike Orr 
+wrote a buffet-like library also called Smorgasbord:
+
+  http://sluggo.scrapping.cc/python/smorgasbord/
+
+License
+=======
+
+Copyright (c) 2008, 2009, Jacob Smullyan
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+ * Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+
+ * Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in the
+   documentation and/or other materials provided with the
+   distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
