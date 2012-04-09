@@ -66,7 +66,7 @@ smorgasbord's template-language-multiplexing equivalent.
 Then assign to the configuration variable ``TEMPLATE_LANGUAGES``
 a tuple of languages you want to use, e.g.::
  
-  TEMPLATE_LANGUAGES=('django', 'mako', 'jinja2')
+  TEMPLATE_LANGUAGES=('django', 'mako', 'jinja2', 'pystache')
 
 For each language (except ``django``, which already uses
 ``TEMPLATE_DIRS`` for this purpose) in that tuple, define a tuple of
@@ -120,6 +120,7 @@ A less sure level of support is available for:
     * jinja2
     * cheetah
     * STML 
+    * pystache
 
 Patches to improve engine support would be welcome.
 

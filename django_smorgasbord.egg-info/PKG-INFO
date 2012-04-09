@@ -16,6 +16,7 @@ Description: Smorgasbord makes it possible to use multiple template languages in
         * jinja2
         * cheetah
         * STML
+        * pystache
         
 Keywords: django jinja2 skunkweb STML cheetah mako templating satimol
 Platform: OS Independent

@@ -16,6 +16,7 @@ Currently supported languages are:
     * jinja2
     * cheetah
     * STML 
+    * pystache
 """
 
 VERSION='0.3'

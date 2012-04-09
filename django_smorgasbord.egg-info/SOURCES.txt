@@ -8,6 +8,7 @@ setup.py
 ./smorgasbord/languages/jinja2support.py
 ./smorgasbord/languages/makosupport.py
 ./smorgasbord/languages/stmlsupport.py
+./smorgasbord/languages/pystachesupport.py
 django_smorgasbord.egg-info/PKG-INFO
 django_smorgasbord.egg-info/SOURCES.txt
 django_smorgasbord.egg-info/dependency_links.txt
