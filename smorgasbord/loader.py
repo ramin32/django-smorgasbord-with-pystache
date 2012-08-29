@@ -85,11 +85,10 @@ def get_template(template_name):
                 continue
         try:
             source, origin = find_template_source(template_name, dirs)
-            return get_template_from_string(lang, source, origin, template_name)
-
         except TemplateDoesNotExist as e:
-            pass
-
+            continue
+        return get_template_from_string(lang, source, origin, template_name)
+        
     raise TemplateDoesNotExist, template_name
 
 def monkeypatch_loader():
