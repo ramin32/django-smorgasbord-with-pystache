@@ -1,6 +1,6 @@
 Metadata-Version: 1.0
 Name: django-smorgasbord
-Version: 0.3
+Version: 0.4
 Summary: transparent support for multiple templating languages in Django
 Home-page: http://code.google.com/p/smorgasbord/
 Author: Jacob Smullyan
